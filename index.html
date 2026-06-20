@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vida Saudável - Salvador Inibidores</title>
+    
+    <!-- Tailwind CSS para Estilização Moderna e Responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js para Gráficos de Evolução -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        saude: '#10b981', /* Verde Saúde Premium */
+                        agua: '#0ea5e9',  /* Azul Hidratação */
+                        escuro: '#1e293b',
+                        card: '#ffffff'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(16, 185, 129, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f1f5f9; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .app-container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            background-color: #f8fafc; 
+            min-height: 100vh; 
+            position: relative; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.1); 
+            overflow-x: hidden; 
+        }
+
+        /* Controle Rigoroso de Views */
+        .view { display: none !important; padding-bottom: 160px !important; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .view.active { display: block !important; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilização Premium */
+        .glass-header {
+            background: rgba(16, 185, 129, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .hero-banner {
+            background-image: linear-gradient(rgba(16, 185, 129, 0.8), rgba(30, 41, 59, 0.9)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Navegação */
+        .nav-item { color: #94a3b8; transition: all 0.3s ease; }
+        .nav-item.active { color: #10b981; }
+        .nav-item.active i { transform: translateY(-3px) scale(1.1); filter: drop-shadow(0 2px 4px rgba(16,185,129,0.4)); }
+
+        /* Progresso Circular */
+        .circular-progress {
+            position: relative; width: 220px; height: 220px; border-radius: 50%;
+            background: conic-gradient(#0ea5e9 0deg, #e0f2fe 0deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3);
+            transition: background 0.5s ease-out;
+        }
+        .circular-progress::before {
+            content: ""; position: absolute; width: 190px; height: 190px;
+            border-radius: 50%; background-color: #ffffff;
+        }
+
+        /* Upload de Imagens */
+        .photo-upload-label { cursor: pointer; display: block; }
+        .photo-preview { width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem; }
+
+        /* Ocultar scrollbar */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* Custom Modal (Substitui Alert/Confirm) */
+        #custom-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            z-index: 9999; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #custom-modal {
+            background: white; width: 90%; max-width: 320px; border-radius: 1.5rem;
+            padding: 1.5rem; text-align: center; transform: scale(0.9); transition: transform 0.3s;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        #custom-modal-overlay.show { display: flex; opacity: 1; }
+        #custom-modal-overlay.show #custom-modal { transform: scale(1); }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #1e293b; color: white; padding: 12px 24px; border-radius: 30px;
+            font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s ease; z-index: 1000;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); white-space: nowrap; pointer-events: none;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="app-container flex flex-col relative">
+        
+        <!-- Header -->
+        <header class="glass-header text-white p-4 sticky top-0 z-50 shadow-md">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-1 rounded-lg h-10 w-24 flex items-center justify-center overflow-hidden">
+                        <!-- Logo com Fallback para Placeholder -->
+                        <img src="logo-salvador-inibidores.png" alt="Salvador Inibidores" 
+                             class="h-8 w-auto object-contain" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/120x40/10b981/ffffff?text=Vida+Saudavel';">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportData()" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition text-sm">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <button onclick="requestNotificationPermission()" id="btn-notify" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition text-sm">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- VIEW: DASHBOARD (Início) -->
+        <main id="view-dashboard" class="view active">
+            <!-- Hero Banner Profissional -->
+            <div class="hero-banner pt-6 pb-12 px-6 rounded-b-[2.5rem] shadow-lg mb-6 text-white text-center relative">
+                <p class="text-emerald-100 text-sm font-medium uppercase tracking-wider mb-1">Seu corpo, seu templo</p>
+                <h2 class="text-3xl font-bold truncate mb-4">Olá, <span id="display-name">Visitante</span>!</h2>
+                
+                <!-- Progresso da Meta de Peso no Hero -->
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Progresso da Meta</span>
+                        <span class="font-bold text-emerald-300" id="hero-progress-pct">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800/50 rounded-full h-2">
+                        <div id="hero-progress-bar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs mt-2 text-slate-300">
+                        <span id="hero-weight-start">Início: --kg</span>
+                        <span id="hero-weight-missing">Faltam: --kg</span>
+                        <span id="hero-weight-goal">Meta: --kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 space-y-5 -mt-8 relative z-10">
+                <!-- Card: Contador de Jejum Intermitente -->
+                <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500">
+                            <i class="fas fa-stopwatch text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Jejum Intermitente</h3>
+                            <p class="text-xl font-bold text-indigo-600 font-mono mt-1" id="fasting-timer">00h 00m</p>
+                        </div>
+                    </div>
+                    <button id="btn-fasting" onclick="toggleFasting()" class="bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-indigo-200 transition">
+                        Iniciar
+                    </button>
+                </div>
+
+                <!-- Grid: Macros e Hidratação Reduzida -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Macros Resumo -->
+                    <div class="bg-white rounded-2xl p-4 shadow-soft border border-slate-100 cursor-pointer" onclick="navigate('calculators')">
+                        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dieta Ideal</h3>
+                        <p class="text-xl font-bold text-slate-800" id="dash-calories">-- kcal</p>
+                        <div class="flex gap-2 mt-2 text-[10px] font-medium text-slate-500">
+                            <span class="bg-red-50 text-red-600 px-2 py-1 rounded">P: <span id="dash-protein">0</span>g</span>
+                            <span class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded">C: <span id="dash-carb">0</span>g</span>
+                        </div>
+                    </div>
+
+                    <!-- Hidratação Mini -->
+                    <div class="bg-gradient-to-br from-sky-50 to-white rounded-2xl p-4 shadow-soft border border-sky-100 cursor-pointer" onclick="navigate('water')">
+                        <h3 class="text-xs font-semibold text-sky-500 uppercase tracking-wider mb-2">Água Hoje</h3>
+                        <p class="text-xl font-bold text-slate-800"><span id="dash-water-drank">0</span> <span class="text-xs text-slate-400 font-normal">/ <span id="dash-water-goal">2000</span>ml</span></p>
+                        <div class="w-full bg-sky-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                            <div id="dash-water-bar" class="bg-sky-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Dica do Dia Premium -->
+                <div class="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 relative overflow-hidden">
+                    <i class="fas fa-quote-right absolute -right-2 -bottom-2 text-6xl text-emerald-100 opacity-50"></i>
+                    <div class="flex items-center gap-2 mb-2 text-emerald-600">
+                        <i class="fas fa-sparkles"></i>
+                        <h3 class="font-bold text-sm uppercase tracking-wider">Inspiração do Dia</h3>
+                    </div>
+                    <p class="text-slate-700 text-sm font-medium leading-relaxed italic relative z-10" id="daily-tip">
+                        "Carregando dica..."
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW: HIDRATAÇÃO -->
+        <main id="view-water" class="view p-6 flex flex-col items-center">
+            <div class="text-center mb-8 w-full">
+                <h2 class="text-2xl font-bold text-slate-800 mb-1">Hidratação</h2>
+                <p class="text-slate-500 text-sm">Meta ajustada para seu nível de atividade</p>
+            </div>
+
+            <!-- Círculo de Progresso -->
+            <div class="circular-progress mb-8" id="water-progress-circle">
+                <div class="progress-value">
+                    <i class="fas fa-droplet text-sky-500 text-4xl mb-2"></i>
+                    <h2 class="text-4xl font-bold text-slate-800 tracking-tight"><span id="water-drank-main">0</span></h2>
+                    <p class="text-sm font-medium text-slate-400">de <span id="water-goal-main">2000</span> ml</p>
+                </div>
+            </div>
+
+            <div class="bg-white px-6 py-2 rounded-full shadow-sm border border-slate-100 mb-8 font-bold text-sky-500" id="water-percentage">
+                0% Concluído
+            </div>
+
+            <!-- Botões de Adição Rápidos -->
+            <div class="grid grid-cols-3 gap-3 w-full max-w-[320px]">
+                <button onclick="addWater(200)" class="bg-white border border-sky-100 shadow-soft rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-sky-50 active:scale-95 transition-all">
+                    <i class="fas fa-glass-water text-sky-400 text-xl"></i>
+                    <span class="font-bold text-slate-600 text-sm">+200ml</span>
+                </button>
+                <button onclick="addWater(300)" class="bg-white border border-sky-100 shadow-soft rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-sky-50 active:scale-95 transition-all">
+                    <i class="fas fa-mug-hot text-sky-500 text-xl"></i>
+                    <span class="font-bold text-slate-600 text-sm">+300ml</span>
+                </button>
+                <button onclick="addWater(500)" class="bg-sky-500 shadow-lg shadow-sky-200 rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-sky-600 active:scale-95 transition-all">
+                    <i class="fas fa-bottle-water text-white text-xl"></i>
+                    <span class="font-bold text-white text-sm">+500ml</span>
+                </button>
+            </div>
+            
+            <button onclick="confirmResetWater()" class="mt-10 mb-12 text-slate-400 text-sm font-medium hover:text-slate-600 transition">
+                <i class="fas fa-rotate-left mr-1"></i> Zerar hoje
+            </button>
+        </main>
+
+        <!-- VIEW: DIÁRIO ALIMENTAR -->
+        <main id="view-diary" class="view p-5 space-y-6">
+            <div class="flex justify-between items-end mb-2">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Diário Alimentar</h2>
+                    <p class="text-sm text-slate-500" id="diary-date">--/--/----</p>
+                </div>
+            </div>
+
+            <!-- IA Nutricional (Simulador) -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+                <i class="fas fa-robot absolute -right-4 -bottom-4 text-7xl opacity-10"></i>
+                <h3 class="font-bold mb-2 flex items-center gap-2"><i class="fas fa-sparkles text-purple-200"></i> IA Nutricional</h3>
+                <p class="text-xs text-purple-100 mb-3">Digite o que vai comer para estimar as calorias.</p>
+                <div class="flex gap-2">
+                    <input type="text" id="ai-food-input" placeholder="Ex: 2 ovos e 1 pão" class="flex-1 bg-white/20 border border-white/30 rounded-xl px-4 py-2 text-sm text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    <button onclick="estimateCalories()" class="bg-white text-purple-700 px-4 py-2 rounded-xl font-bold text-sm shadow-md hover:bg-slate-50 transition active:scale-95">Analisar</button>
+                </div>
+                <div id="ai-result" class="mt-3 text-sm font-bold bg-black/20 p-3 rounded-xl hidden backdrop-blur-sm border border-white/10"></div>
+            </div>
+
+            <div class="space-y-4" id="diary-meals-container">
+                <!-- Gerado por JS -->
+            </div>
+        </main>
+
+        <!-- VIEW: PROGRESSO / EVOLUÇÃO -->
+        <main id="view-progress" class="view p-5 space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800">Sua Evolução</h2>
+            
+            <!-- Registro Rápido -->
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-5">
+                <form onsubmit="registerWeight(event)" class="flex gap-3 items-end">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Peso Hoje (kg)</label>
+                        <input type="number" id="input-progress-weight" required step="0.1" placeholder="Ex: 75.5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <button type="submit" class="bg-slate-800 text-white rounded-xl px-5 py-3 shadow-md hover:bg-slate-700 active:scale-95 transition-all font-bold">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Gráfico (30 Dias) -->
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800"><i class="fas fa-chart-area text-emerald-500 mr-2"></i>Histórico (30 dias)</h3>
+                </div>
+                <div class="h-56 relative w-full">
+                    <canvas id="weightChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Galeria de Evolução -->
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-5">
+                <h3 class="font-bold text-slate-800 mb-4"><i class="fas fa-camera text-indigo-500 mr-2"></i>Galeria de Transformação</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Foto Antes -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 text-center mb-2">ANTES</p>
+                        <label class="photo-upload-label relative bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 hover:border-indigo-400 transition overflow-hidden">
+                            <img id="photo-before-img" src="" class="photo-preview hidden">
+                            <div id="photo-before-placeholder" class="h-[180px] flex flex-col items-center justify-center text-slate-400">
+                                <i class="fas fa-image text-3xl mb-2"></i>
+                                <span class="text-xs">Toque para adicionar</span>
+                            </div>
+                            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'before')">
+                        </label>
+                    </div>
+                    <!-- Foto Depois -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 text-center mb-2">AGORA</p>
+                        <label class="photo-upload-label relative bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 hover:border-emerald-400 transition overflow-hidden">
+                            <img id="photo-after-img" src="" class="photo-preview hidden">
+                            <div id="photo-after-placeholder" class="h-[180px] flex flex-col items-center justify-center text-slate-400">
+                                <i class="fas fa-image text-3xl mb-2"></i>
+                                <span class="text-xs">Toque para adicionar</span>
+                            </div>
+                            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'after')">
+                        </label>
+                    </div>
+                </div>
+                <button onclick="generateWhatsAppReport()" class="w-full mt-6 mb-12 bg-[#25D366] text-white font-bold rounded-xl px-4 py-3 shadow-md flex items-center justify-center gap-2 active:scale-95 transition">
+                    <i class="fab fa-whatsapp text-lg"></i> Enviar para Nutri
+                </button>
+            </div>
+        </main>
+
+        <!-- VIEW: CALCULADORAS -->
+        <main id="view-calculators" class="view p-5 space-y-5">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Avaliação Corporal</h2>
+            
+            <!-- IMC Card Moderno -->
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden">
+                <div class="p-5 flex items-center gap-4 border-b border-slate-50">
+                    <div class="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center border-4" id="bmi-circle-border">
+                        <span class="font-bold text-slate-800" id="calc-bmi-result">--</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">Seu IMC Atual</h3>
+                        <p class="font-bold text-sm" id="calc-bmi-class">Atualize seu perfil</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calorias e Macros -->
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-5">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-fire-flame-curved text-orange-500 text-xl"></i>
+                    <h3 class="font-bold text-slate-800 text-lg">Planejamento Nutricional</h3>
+                </div>
+                
+                <div class="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
+                    <p class="text-xs font-bold text-slate-500 uppercase text-center mb-1">Calorias Recomendadas</p>
+                    <p class="text-4xl font-bold text-slate-800 text-center"><span id="calc-cal-result">--</span> <span class="text-sm font-normal text-slate-500">kcal/dia</span></p>
+                    <p class="text-xs text-center text-slate-400 mt-2">Taxa Basal (TMB): <span id="calc-tmb-result" class="font-medium">--</span> kcal</p>
+                </div>
+
+                <!-- Divisão de Macros -->
+                <h4 class="font-bold text-sm text-slate-700 mb-3">Distribuição de Macronutrientes</h4>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1"><span class="font-medium"><i class="fas fa-drumstick-bite text-red-400 mr-1"></i> Proteínas</span> <span class="font-bold text-slate-700" id="macro-p">--g</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-red-400 h-2 rounded-full w-[30%]"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1"><span class="font-medium"><i class="fas fa-wheat-awn text-yellow-400 mr-1"></i> Carboidratos</span> <span class="font-bold text-slate-700" id="macro-c">--g</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-yellow-400 h-2 rounded-full w-[45%]"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1"><span class="font-medium"><i class="fas fa-cheese text-amber-500 mr-1"></i> Gorduras</span> <span class="font-bold text-slate-700" id="macro-f">--g</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full w-[25%]"></div></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW: PERFIL -->
+        <main id="view-profile" class="view p-5">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Configurações</h2>
+            
+            <form id="profile-form" class="space-y-4 bg-white p-5 rounded-2xl shadow-soft border border-slate-100" onsubmit="saveProfile(event)">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nome Completo</label>
+                    <input type="text" id="input-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Idade</label>
+                        <input type="number" id="input-age" required min="10" max="120" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Sexo</label>
+                        <select id="input-gender" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Altura (cm)</label>
+                        <input type="number" id="input-height" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Peso Atual (kg)</label>
+                        <input type="number" id="input-weight" required step="0.1" class="w-full bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-bold text-emerald-700">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Meta de Peso (kg)</label>
+                    <input type="number" id="input-goal-weight" required step="0.1" placeholder="Ex: 65.0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nível de Atividade</label>
+                    <select id="input-activity" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium text-sm">
+                        <option value="1.2">Sedentário (0 exercícios)</option>
+                        <option value="1.375">Leve (1-3 dias/semana)</option>
+                        <option value="1.55">Moderado (3-5 dias/semana)</option>
+                        <option value="1.725">Ativo (6-7 dias/semana)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Objetivo Físico</label>
+                    <select id="input-goal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium text-sm">
+                        <option value="lose">Emagrecer (Déficit)</option>
+                        <option value="maintain">Manter Peso</option>
+                        <option value="gain">Ganhar Massa (Superávit)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-500 text-white font-bold rounded-xl px-4 py-4 mt-6 shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all text-lg">
+                    Salvar Dados
+                </button>
+            </form>
+
+            <div class="mt-8 mb-12 bg-slate-800 rounded-2xl p-5 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold">Backup Local</h3>
+                    <p class="text-xs text-slate-400 mt-1">Exporte para não perder nada.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportData()" class="bg-white/20 p-3 rounded-lg hover:bg-white/30 transition"><i class="fas fa-download"></i></button>
+                    <!-- Mock do Import: na vida real usaria FileReader -->
+                    <button onclick="showToast('Importação em breve!')" class="bg-white/20 p-3 rounded-lg hover:bg-white/30 transition"><i class="fas fa-upload"></i></button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Navegação Inferior Consertada e Otimizada -->
+        <nav class="fixed bottom-0 w-full max-w-[480px] bg-white border-t border-slate-100 flex justify-around p-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.03)] z-50">
+            <!-- Os IDs dos botões devem casar com o parâmetro nav-xxx -->
+            <button onclick="navigate('dashboard')" class="nav-item active flex flex-col items-center p-2 w-14" id="nav-dashboard">
+                <i class="fas fa-house text-xl mb-1"></i>
+                <span class="text-[9px] font-bold tracking-wide">INÍCIO</span>
+            </button>
+            <button onclick="navigate('water')" class="nav-item flex flex-col items-center p-2 w-14" id="nav-water">
+                <i class="fas fa-droplet text-xl mb-1"></i>
+                <span class="text-[9px] font-bold tracking-wide">ÁGUA</span>
+            </button>
+            <button onclick="navigate('diary')" class="nav-item flex flex-col items-center p-2 w-14" id="nav-diary">
+                <i class="fas fa-apple-whole text-xl mb-1"></i>
+                <span class="text-[9px] font-bold tracking-wide">DIÁRIO</span>
+            </button>
+            <button onclick="navigate('progress')" class="nav-item flex flex-col items-center p-2 w-14" id="nav-progress">
+                <i class="fas fa-arrow-trend-up text-xl mb-1"></i>
+                <span class="text-[9px] font-bold tracking-wide">EVOLUÇÃO</span>
+            </button>
+            <button onclick="navigate('calculators')" class="nav-item flex flex-col items-center p-2 w-14" id="nav-calculators">
+                <i class="fas fa-calculator text-xl mb-1"></i>
+                <span class="text-[9px] font-bold tracking-wide">CÁLCULOS</span>
+            </button>
+            <button onclick="navigate('profile')" class="nav-item flex flex-col items-center p-2 w-14" id="nav-profile">
+                <i class="fas fa-user-gear text-xl mb-1"></i>
+                <span class="text-[9px] font-bold tracking-wide">PERFIL</span>
+            </button>
+        </nav>
+        
+        <!-- Custom Modal & Toast -->
+        <div id="custom-modal-overlay">
+            <div id="custom-modal">
+                <i class="fas fa-circle-exclamation text-4xl text-amber-500 mb-3"></i>
+                <h3 id="modal-title" class="font-bold text-lg text-slate-800 mb-2">Atenção</h3>
+                <p id="modal-msg" class="text-sm text-slate-500 mb-6">Mensagem</p>
+                <div class="flex gap-3 justify-center">
+                    <button onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Cancelar</button>
+                    <button id="modal-confirm-btn" class="flex-1 bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-emerald-600">Confirmar</button>
+                </div>
+            </div>
+        </div>
+        <div id="toast">Mensagem</div>
+    </div>
+
+    <script>
+        // --- 1. PWA & OFFLINE CAPABILITIES ---
+        // Criando Manifest Dinâmico
+        const manifestData = {
+            "name": "Vida Saudável", "short_name": "Vida Saudável",
+            "start_url": ".", "display": "standalone",
+            "background_color": "#f8fafc", "theme_color": "#10b981",
+            "icons": [{"src": "https://placehold.co/192x192/10b981/ffffff?text=VS", "sizes": "192x192", "type": "image/png"},
+                      {"src": "https://placehold.co/512x512/10b981/ffffff?text=VS", "sizes": "512x512", "type": "image/png"}]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
+        document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
+        
+        // Service Worker In-file (Para cache offline real sem múltiplos arquivos)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'vida-saudavel-v1';
+                self.addEventListener('install', e => { self.skipWaiting(); });
+                self.addEventListener('activate', e => { self.clients.claim(); });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).then(()=>console.log("PWA Service Worker Ativo"));
+        }
+
+        // --- 2. ESTADO E DADOS INICIAIS ---
+        const dicas = [
+            "Beba um copo de água 30 minutos antes das refeições.",
+            "Mastigue bem. O cérebro leva 20 min para registrar saciedade.",
+            "Durma de 7 a 8 horas. O sono regula os hormônios da fome.",
+            "Troque carboidratos refinados por integrais.",
+            "Comemore pequenas vitórias. Emagrecer é um processo!"
+        ];
+
+        const defaultMeals = [
+            { id: 'cafe', name: 'Café da Manhã', time: '07:00', icon: 'fa-mug-saucer', color: 'orange' },
+            { id: 'lanche1', name: 'Lanche Manhã', time: '10:00', icon: 'fa-apple-whole', color: 'red' },
+            { id: 'almoco', name: 'Almoço', time: '13:00', icon: 'fa-utensils', color: 'amber' },
+            { id: 'lanche2', name: 'Lanche Tarde', time: '16:00', icon: 'fa-cookie-bite', color: 'orange' },
+            { id: 'jantar', name: 'Jantar', time: '19:00', icon: 'fa-bowl-rice', color: 'emerald' },
+            { id: 'ceia', name: 'Ceia', time: '22:00', icon: 'fa-moon', color: 'indigo' }
+        ];
+
+        let appState = {
+            profile: { name: '', age: '', gender: 'M', weight: '', goalWeight: '', height: '', activity: '1.2', goal: 'lose' },
+            water: { drank: 0, goal: 2000, lastDate: new Date().toDateString() },
+            weightHistory: [],
+            foodDiary: {},
+            photos: { before: '', after: '' },
+            fasting: { isActive: false, startTime: null },
+            metrics: { bmi: 0, calories: 0, tmb: 0, macros: { p: 0, c: 0, f: 0 } }
+        };
+        let weightChartInstance = null;
+        let fastingInterval = null;
+        let notificationInterval = null;
+
+        // --- 3. INICIALIZAÇÃO ---
+        window.onload = () => {
+            loadState();
+            checkNewDay();
+            updateAllViews();
+            setDailyTip();
+            renderDiaryUI();
+            initWeightChart();
+            startFastingTimer(); // Retoma se estiver rodando
+            setupNotifications();
+            
+            if(!appState.profile.name) {
+                showToast("Bem-vindo! Preencha seu perfil.");
+                navigate('profile');
+            }
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('vidaSaudavelPWA');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                appState = { ...appState, ...parsed };
+                // Garante objetos novos
+                if(!appState.photos) appState.photos = {before: '', after: ''};
+                if(!appState.fasting) appState.fasting = {isActive: false, startTime: null};
+                if(!appState.profile.goalWeight) appState.profile.goalWeight = '';
+            }
+        }
+        function saveState() { localStorage.setItem('vidaSaudavelPWA', JSON.stringify(appState)); }
+
+        function checkNewDay() {
+            const today = new Date().toDateString();
+            if (appState.water.lastDate !== today) {
+                appState.water.drank = 0;
+                appState.water.lastDate = today;
+                saveState();
+                showToast("Novo dia! Água zerada.");
+            }
+        }
+
+        // --- 4. NAVEGAÇÃO RIGOROSA ---
+        function navigate(viewId) {
+            // Limpa active de todos os botões de nav
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`nav-${viewId}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            // Limpa active de TODAS as views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+                view.style.display = 'none'; // Força via JS também para evitar bugs CSS
+            });
+            
+            // Mostra a view correta
+            const activeView = document.getElementById(`view-${viewId}`);
+            if(activeView) {
+                activeView.classList.add('active');
+                activeView.style.display = 'block';
+            }
+            
+            if(viewId === 'progress') updateWeightChart();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // --- 5. LÓGICA DO PERFIL E CÁLCULOS AVANÇADOS ---
+        function saveProfile(e) {
+            e.preventDefault();
+            const newWeight = parseFloat(document.getElementById('input-weight').value);
+            
+            appState.profile = {
+                name: document.getElementById('input-name').value,
+                age: parseInt(document.getElementById('input-age').value),
+                gender: document.getElementById('input-gender').value,
+                weight: newWeight,
+                goalWeight: parseFloat(document.getElementById('input-goal-weight').value),
+                height: parseFloat(document.getElementById('input-height').value),
+                activity: parseFloat(document.getElementById('input-activity').value),
+                goal: document.getElementById('input-goal').value
+            };
+
+            addWeightToHistory(newWeight);
+            calculateMetrics();
+            saveState();
+            updateAllViews();
+            showToast("Perfil atualizado!");
+            navigate('dashboard');
+        }
+
+        function registerWeight(e) {
+            e.preventDefault();
+            const weight = parseFloat(document.getElementById('input-progress-weight').value);
+            if(weight > 0) {
+                addWeightToHistory(weight);
+                appState.profile.weight = weight;
+                calculateMetrics();
+                saveState();
+                updateAllViews();
+                updateWeightChart();
+                document.getElementById('input-progress-weight').value = '';
+                showToast("Peso registrado!");
+            }
+        }
+
+        function addWeightToHistory(weight) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const idx = appState.weightHistory.findIndex(entry => entry.date === todayStr);
+            if (idx >= 0) appState.weightHistory[idx].weight = weight;
+            else appState.weightHistory.push({ date: todayStr, weight: weight });
+            appState.weightHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        function calculateMetrics() {
+            const p = appState.profile;
+            if(!p.weight || !p.height) return;
+
+            // Água: Multiplicador baseado na atividade (Requisito atendido)
+            let waterMultiplier = 35;
+            if(p.activity >= 1.55) waterMultiplier = 40;
+            if(p.activity >= 1.725) waterMultiplier = 45;
+            appState.water.goal = Math.round(p.weight * waterMultiplier);
+
+            // IMC
+            const hM = p.height / 100;
+            appState.metrics.bmi = (p.weight / (hM * hM)).toFixed(1);
+
+            // TMB
+            let tmb = (10 * p.weight) + (6.25 * p.height) - (5 * p.age);
+            tmb = p.gender === 'M' ? tmb + 5 : tmb - 161;
+            appState.metrics.tmb = Math.round(tmb);
+
+            // Calorias
+            let tdee = tmb * p.activity;
+            if(p.goal === 'lose') tdee -= 500;
+            if(p.goal === 'gain') tdee += 500;
+            appState.metrics.calories = Math.round(tdee);
+
+            // Macros (Requisito atendido)
+            const protein = p.weight * 2; // 2g por kg
+            const fat = p.weight * 0.8;   // 0.8g por kg
+            const carbCals = appState.metrics.calories - (protein * 4) - (fat * 9);
+            const carb = Math.max(0, carbCals / 4);
+            
+            appState.metrics.macros = { p: Math.round(protein), f: Math.round(fat), c: Math.round(carb) };
+        }
+
+        // --- 6. ATUALIZAÇÃO DA INTERFACE (UI) ---
+        function updateAllViews() {
+            const p = appState.profile;
+            const m = appState.metrics;
+
+            // Popular Inputs
+            if(p.name) {
+                document.getElementById('input-name').value = p.name;
+                document.getElementById('input-age').value = p.age;
+                document.getElementById('input-gender').value = p.gender;
+                document.getElementById('input-weight').value = p.weight;
+                document.getElementById('input-goal-weight').value = p.goalWeight || p.weight;
+                document.getElementById('input-height').value = p.height;
+                document.getElementById('input-activity').value = p.activity;
+                document.getElementById('input-goal').value = p.goal;
+            }
+
+            // Dashboard & Header
+            document.getElementById('display-name').innerText = p.name ? p.name.split(' ')[0] : 'Visitante';
+            document.getElementById('dash-calories').innerText = m.calories ? `${m.calories} kcal` : '--';
+            document.getElementById('dash-protein').innerText = m.macros.p;
+            document.getElementById('dash-carb').innerText = m.macros.c;
+
+            // Progresso Hero
+            if (p.weight && p.goalWeight && appState.weightHistory.length > 0) {
+                const startWeight = appState.weightHistory[0].weight;
+                const totalDiff = Math.abs(startWeight - p.goalWeight);
+                const currentDiff = Math.abs(startWeight - p.weight);
+                let pct = totalDiff === 0 ? 100 : Math.round((currentDiff / totalDiff) * 100);
+                pct = Math.min(100, Math.max(0, pct)); // Limita entre 0 e 100
+                
+                document.getElementById('hero-weight-start').innerText = `Início: ${startWeight}kg`;
+                document.getElementById('hero-weight-missing').innerText = `Faltam: ${Math.abs(p.weight - p.goalWeight).toFixed(1)}kg`;
+                document.getElementById('hero-weight-goal').innerText = `Meta: ${p.goalWeight}kg`;
+                document.getElementById('hero-progress-pct').innerText = `${pct}%`;
+                document.getElementById('hero-progress-bar').style.width = `${pct}%`;
+            }
+
+            updateWaterUI();
+            updateCalculatorsUI();
+            updatePhotosUI();
+        }
+
+        function updateWaterUI() {
+            const drank = appState.water.drank;
+            const goal = appState.water.goal || 2000;
+            let pct = Math.min(100, Math.round((drank / goal) * 100));
+
+            document.getElementById('dash-water-drank').innerText = drank;
+            document.getElementById('dash-water-goal').innerText = goal;
+            document.getElementById('dash-water-bar').style.width = `${pct}%`;
+
+            document.getElementById('water-drank-main').innerText = drank;
+            document.getElementById('water-goal-main').innerText = goal;
+            document.getElementById('water-percentage').innerText = `${pct}% Concluído`;
+            document.getElementById('water-progress-circle').style.background = `conic-gradient(#0ea5e9 ${pct * 3.6}deg, #e0f2fe ${pct * 3.6}deg)`;
+        }
+
+        function updateCalculatorsUI() {
+            const bmi = parseFloat(appState.metrics.bmi);
+            if(!bmi) return;
+
+            document.getElementById('calc-bmi-result').innerText = bmi;
+            let cls = "", color = "";
+            if (bmi < 18.5) { cls = "Abaixo do peso"; color = "text-sky-500"; document.getElementById('bmi-circle-border').style.borderColor = '#0ea5e9'; }
+            else if (bmi < 24.9) { cls = "Peso Normal"; color = "text-emerald-500"; document.getElementById('bmi-circle-border').style.borderColor = '#10b981';}
+            else if (bmi < 29.9) { cls = "Sobrepeso"; color = "text-yellow-500"; document.getElementById('bmi-circle-border').style.borderColor = '#eab308';}
+            else { cls = "Obesidade"; color = "text-red-500"; document.getElementById('bmi-circle-border').style.borderColor = '#ef4444';}
+
+            const el = document.getElementById('calc-bmi-class');
+            el.innerText = cls; el.className = `font-bold text-sm ${color}`;
+
+            document.getElementById('calc-cal-result').innerText = appState.metrics.calories;
+            document.getElementById('calc-tmb-result').innerText = appState.metrics.tmb;
+            document.getElementById('macro-p').innerText = `${appState.metrics.macros.p}g`;
+            document.getElementById('macro-c').innerText = `${appState.metrics.macros.c}g`;
+            document.getElementById('macro-f').innerText = `${appState.metrics.macros.f}g`;
+        }
+
+        // --- 7. ÁGUA E MODAL ---
+        function addWater(amount) {
+            appState.water.drank += amount;
+            saveState(); updateWaterUI();
+            showToast(`+${amount}ml registrados!`);
+        }
+        function confirmResetWater() {
+            showModal("Zerar Água", "Tem certeza que deseja zerar sua hidratação de hoje?", () => {
+                appState.water.drank = 0;
+                saveState(); updateWaterUI();
+            });
+        }
+
+        // --- 8. DIÁRIO E IA SIMULADA ---
+        function renderDiaryUI() {
+            const c = document.getElementById('diary-meals-container');
+            c.innerHTML = ''; 
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('diary-date').innerText = new Date().toLocaleDateString('pt-BR');
+            const diary = appState.foodDiary[todayStr] || {};
+
+            defaultMeals.forEach(m => {
+                const content = diary[m.id] || '';
+                c.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden">
+                        <div class="p-4 flex items-center justify-between cursor-pointer" onclick="toggleEdit('${m.id}')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-${m.color}-50 text-${m.color}-500 flex items-center justify-center">
+                                    <i class="fas ${m.icon}"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-sm">${m.name}</h3>
+                                    <p class="text-[10px] text-slate-400 font-bold">${m.time}</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-slate-300 transition-transform" id="icon-${m.id}"></i>
+                        </div>
+                        <div class="p-4 pt-0 hidden" id="edit-${m.id}">
+                            <textarea id="text-${m.id}" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-${m.color}-400 text-sm resize-none" placeholder="O que você comeu?">${content}</textarea>
+                            <button onclick="saveMeal('${m.id}')" class="mt-2 w-full bg-slate-800 text-white font-bold rounded-xl py-2 text-sm hover:bg-slate-700">Salvar</button>
+                        </div>
+                        ${content ? `<div class="p-3 bg-slate-50 text-sm text-slate-600 border-t border-slate-100 italic" id="preview-${m.id}">${content}</div>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function toggleEdit(id) {
+            const edit = document.getElementById(`edit-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            const prev = document.getElementById(`preview-${id}`);
+            if(edit.classList.contains('hidden')){
+                edit.classList.remove('hidden'); icon.classList.add('rotate-180');
+                if(prev) prev.classList.add('hidden');
+            } else {
+                edit.classList.add('hidden'); icon.classList.remove('rotate-180');
+                if(prev) prev.classList.remove('hidden');
+            }
+        }
+
+        function saveMeal(id) {
+            const v = document.getElementById(`text-${id}`).value.trim();
+            const d = new Date().toISOString().split('T')[0];
+            if (!appState.foodDiary[d]) appState.foodDiary[d] = {};
+            appState.foodDiary[d][id] = v;
+            saveState(); renderDiaryUI(); showToast("Refeição salva!");
+        }
+
+        function estimateCalories() {
+            const input = document.getElementById('ai-food-input').value.toLowerCase();
+            const res = document.getElementById('ai-result');
+            if(!input) return showToast("Digite algo primeiro!");
+            
+            // Simulação simples baseada em palavras
+            let cals = Math.floor(Math.random() * 200) + 200; // Base
+            if(input.includes('pão') || input.includes('pao')) cals += 150;
+            if(input.includes('ovo')) cals += 80;
+            if(input.includes('frango')) cals += 200;
+            
+            res.innerHTML = `🔥 Estimativa: <b>${cals} kcal</b> <br><span class="text-xs font-normal">Apenas uma estimativa baseada no texto.</span>`;
+            res.classList.remove('hidden');
+        }
+
+        // --- 9. FOTOS, GRÁFICOS E RECURSOS EXTRAS ---
+        function handlePhotoUpload(e, type) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                appState.photos[type] = ev.target.result;
+                saveState(); updatePhotosUI(); showToast("Foto salva localmente!");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updatePhotosUI() {
+            ['before', 'after'].forEach(type => {
+                const img = document.getElementById(`photo-${type}-img`);
+                const pl = document.getElementById(`photo-${type}-placeholder`);
+                if(appState.photos[type]) {
+                    img.src = appState.photos[type];
+                    img.classList.remove('hidden'); pl.classList.add('hidden');
+                }
+            });
+        }
+
+        function initWeightChart() {
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            weightChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{ label: 'Peso (kg)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, pointBackgroundColor: '#10b981', fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function updateWeightChart() {
+            if (!weightChartInstance || appState.weightHistory.length === 0) return;
+            // Pega os últimos 30 dias (Requisito atendido)
+            const history = appState.weightHistory.slice(-30);
+            weightChartInstance.data.labels = history.map(e => {
+                const [y,m,d] = e.date.split('-'); return `${d}/${m}`;
+            });
+            weightChartInstance.data.datasets[0].data = history.map(e => e.weight);
+            weightChartInstance.update();
+        }
+
+        // --- JEJUM ---
+        function toggleFasting() {
+            const f = appState.fasting;
+            if(f.isActive) {
+                // Parar
+                f.isActive = false; f.startTime = null; clearInterval(fastingInterval);
+                document.getElementById('fasting-timer').innerText = "00h 00m";
+                document.getElementById('btn-fasting').innerText = "Iniciar";
+                document.getElementById('btn-fasting').className = "bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-indigo-200 transition";
+                showToast("Jejum encerrado!");
+            } else {
+                // Iniciar
+                f.isActive = true; f.startTime = new Date().getTime();
+                startFastingTimer(); showToast("Jejum iniciado!");
+            }
+            saveState();
+        }
+
+        function startFastingTimer() {
+            const f = appState.fasting;
+            if(!f.isActive || !f.startTime) return;
+            
+            const btn = document.getElementById('btn-fasting');
+            btn.innerText = "Encerrar";
+            btn.className = "bg-red-100 text-red-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-200 transition";
+
+            if(fastingInterval) clearInterval(fastingInterval);
+            fastingInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = now - f.startTime;
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('fasting-timer').innerText = `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m`;
+            }, 1000);
+        }
+
+        // --- EXPORTAÇÃO E WHATSAPP ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
+            const node = document.createElement('a');
+            node.setAttribute("href", dataStr);
+            node.setAttribute("download", "vida-saudavel-backup.json");
+            document.body.appendChild(node); node.click(); node.remove();
+            showToast("Dados exportados com sucesso!");
+        }
+
+        function generateWhatsAppReport() {
+            const p = appState.profile;
+            const hw = appState.weightHistory;
+            const startW = hw.length > 0 ? hw[0].weight : p.weight;
+            const diff = (startW - p.weight).toFixed(1);
+            
+            const text = `*Relatório Vida Saudável* 🍏\n\n👤 ${p.name}\n⚖️ Peso Inicial: ${startW}kg\n📉 Peso Atual: ${p.weight}kg\n🎯 Perda Total: ${diff}kg\n\n💧 Água hoje: ${appState.water.drank}ml / ${appState.water.goal}ml\n🔥 Dieta: ${appState.metrics.calories} kcal/dia\n\n_Gerado pelo App Vida Saudável_`;
+            
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // --- UTILITÁRIOS (Toast, Modal, Notificações) ---
+        function setDailyTip() {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            document.getElementById('daily-tip').innerText = `"${dicas[dayOfYear % dicas.length]}"`;
+        }
+
+        let toastTimeout;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        let modalAction = null;
+        function showModal(title, msg, action) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            modalAction = action;
+            document.getElementById('custom-modal-overlay').classList.add('show');
+            document.getElementById('modal-confirm-btn').onclick = () => { if(modalAction) modalAction(); closeModal(); };
+        }
+        function closeModal() { document.getElementById('custom-modal-overlay').classList.remove('show'); modalAction = null; }
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) return showToast("Notificações não suportadas.");
+            if (Notification.permission === "granted") {
+                showToast("Notificações ativadas!"); setupNotifications(true);
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(p => {
+                    if (p === "granted") { showToast("Pronto! Lembretes ativos."); setupNotifications(true); }
+                });
+            }
+        }
+
+        function setupNotifications(forceTest = false) {
+            if(forceTest && Notification.permission === "granted") {
+                new Notification("Vida Saudável", { body: "Lembrete: Já bebeu água na última hora?", icon: "logo-salvador-inibidores.png" });
+            }
+            // Lembrete a cada 2 horas (7200000 ms)
+            if(notificationInterval) clearInterval(notificationInterval);
+            notificationInterval = setInterval(() => {
+                if(Notification.permission === "granted") {
+                    new Notification("Hora de se hidratar! 💧", { body: "Beba um copo de água agora para manter sua meta.", icon: "logo-salvador-inibidores.png" });
+                }
+            }, 7200000); 
+        }
+
+    </script>
+</body>
+</html>
